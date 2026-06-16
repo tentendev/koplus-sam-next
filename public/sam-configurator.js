@@ -938,16 +938,16 @@ function SamApp(appConfig) {
         <!-- Series name — aligns with the top edge of the product image on the left. -->
         <div>
           <h1 class="font-['Cal_Sans'] text-[40px] md:text-[52px] lg:text-[64px] font-normal leading-[1.05]" style="color:#0a2240">${series.name}</h1>
-          <p class="font-['Noto_Sans'] text-base font-light leading-snug mt-1.5" style="color:#5b6b7b">${series.tagline}</p>
+          <p class="font-['Noto_Sans'] text-base font-light leading-snug mt-0.5" style="color:#5b6b7b">${series.tagline}</p>
         </div>
 
         <!-- Product title — sits directly below the series tagline and updates with the
              selector. Title text is API-driven (config.title); per-size naming lives in CMS. -->
-        <h2 class="font-['Noto_Sans'] text-[22px] md:text-[26px] lg:text-[30px] font-medium leading-[1.2]" style="color:#0a2240">${productTitle}</h2>
+        <h2 class="font-['Noto_Sans'] text-[22px] md:text-[26px] lg:text-[30px] font-medium leading-[1.2] mt-2" style="color:#0a2240">${productTitle}</h2>
 
         <!-- Product selector (Single / Medium / Large) — compact pill with generous
              per-option padding so each segment (incl. the selected one) reads spacious. -->
-        <div class="flex gap-1 rounded-full bg-gray-100 p-1.5 self-start">
+        <div class="flex gap-1 rounded-full bg-gray-100 p-1.5 self-start -mt-2">
           ${products.map(p =>
             `<button onclick="_samSwitchTo('${p.key}')" class="rounded-full px-7 py-2 text-sm font-medium transition ${p.key === activeKey ? 'bg-[#061629] text-white shadow-sm' : 'text-gray-500 hover:text-gray-900'}">${p.label}</button>`
           ).join("\n          ")}
@@ -1098,7 +1098,7 @@ function SamApp(appConfig) {
 
   <!-- Sticky bottom configuration summary bar -->
   <div id="cfg-summary-bar" class="fixed bottom-0 left-0 right-0 z-40 border-t border-gray-200 bg-white" style="box-shadow:0 -2px 12px rgba(0,0,0,0.06)">
-    <div class="mx-auto max-w-7xl px-4 sm:px-8 lg:px-12 py-2.5 sm:py-3 flex items-center gap-2 sm:gap-4">
+    <div class="w-full px-4 sm:px-6 lg:px-8 py-2.5 sm:py-3 flex items-center gap-2 sm:gap-4">
       <!-- Left: live product thumbnail + product / live summary -->
       <div class="flex items-center gap-3 flex-1 min-w-0">
         <div id="summary-thumb" class="hidden sm:block relative aspect-[4/3] h-12 rounded-md overflow-hidden shrink-0 ring-1 ring-gray-200 bg-gradient-to-b from-gray-50 to-white">
