@@ -914,7 +914,7 @@ function SamApp(appConfig) {
     </nav>
   </header>
 
-  <section class="px-4 py-10 md:py-14">
+  <section class="px-2 sm:px-3 py-10 md:py-14">
     <div class="w-full flex flex-col lg:flex-row gap-10">
 
       <!-- LEFT — Product image -->
