@@ -852,7 +852,7 @@ function SamApp(appConfig) {
           address: data.address || "",
           company: data.company,
           companyType: data.companyType,
-          companySize: data.companySize,
+          notes: data.notes || "",
           product: `${series.name} ${productTitle}`,
           productSlug: config.key,
           quantity: quoteQty,
@@ -1131,8 +1131,8 @@ function SamApp(appConfig) {
 
           <!-- Header -->
           <div class="flex items-center justify-between px-6 sm:px-10 py-5 border-b border-gray-200">
-            <span class="text-xs font-semibold tracking-[0.2em] text-gray-400">KOPLUS</span>
-            <h2 class="font-['Cal_Sans'] text-2xl md:text-3xl font-normal" style="color:#0a2240">Request a quote</h2>
+            <img src="/assets/koplus-logo.png" alt="Koplus" class="h-7 w-auto">
+            <h2 class="font-['Cal_Sans'] text-2xl md:text-3xl font-normal" style="color:#0a2240">Request a Quote</h2>
             <button id="quote-close" type="button" aria-label="Close" class="hidden text-gray-400 hover:text-gray-700 transition">
               <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
             </button>
@@ -1143,13 +1143,13 @@ function SamApp(appConfig) {
             <div class="flex flex-col sm:flex-row gap-6">
               <div class="shrink-0 w-full sm:w-auto">
                 <div id="qmodal-thumb" class="relative aspect-[4/3] sm:aspect-square w-full sm:w-64 rounded-xl ring-1 ring-gray-200 overflow-hidden bg-gradient-to-b from-gray-50 to-white"></div>
-                <div class="mt-3 font-['Noto_Sans'] text-lg font-medium text-center sm:text-left" style="color:#0a2240">${productTitle}</div>
+                <div class="mt-3 font-['Noto_Sans'] text-lg font-medium text-center sm:text-left" style="color:#0a2240">${series.name} ${productTitle}</div>
               </div>
               <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-x-10 sm:self-start">
                 <div class="flex justify-between border-b border-gray-200 py-3"><span class="text-sm font-semibold text-gray-800">Frame</span><span id="qspec-frame" class="text-sm text-gray-500"></span></div>
                 <div class="flex justify-between border-b border-gray-200 py-3"><span class="text-sm font-semibold text-gray-800">Door</span><span id="qspec-door" class="text-sm text-gray-500"></span></div>
                 <div class="flex justify-between border-b border-gray-200 py-3"><span class="text-sm font-semibold text-gray-800">Interior</span><span id="qspec-interior" class="text-sm text-gray-500"></span></div>
-                <div class="flex justify-between border-b border-gray-200 py-3"><span class="text-sm font-semibold text-gray-800">Back panel</span><span id="qspec-panel" class="text-sm text-gray-500"></span></div>
+                <div class="flex justify-between border-b border-gray-200 py-3"><span class="text-sm font-semibold text-gray-800">Back Panel</span><span id="qspec-panel" class="text-sm text-gray-500"></span></div>
                 <div class="flex justify-between border-b border-gray-200 py-3"><span class="text-sm font-semibold text-gray-800">Exterior</span><span id="qspec-exterior" class="text-sm text-gray-500"></span></div>
                 <div class="flex justify-between border-b border-gray-200 py-3"><span class="text-sm font-semibold text-gray-800">Tabletop Colour</span><span id="qspec-tabletop" class="text-sm text-gray-500"></span></div>
                 <div class="flex items-center justify-between py-3">
@@ -1167,28 +1167,21 @@ function SamApp(appConfig) {
           <!-- Lead form -->
           <form id="quote-form" class="bg-gray-50 px-6 sm:px-10 py-8 mt-6 rounded-b-2xl">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <input name="firstName" required placeholder="First name *" class="qinput">
-              <input name="lastName" required placeholder="Last name *" class="qinput">
+              <input name="firstName" required placeholder="First Name *" class="qinput">
+              <input name="lastName" required placeholder="Last Name *" class="qinput">
               <input name="email" type="email" required placeholder="Email *" class="qinput sm:col-span-2">
               <input name="phone" required placeholder="Phone *" class="qinput">
               <input name="country" required placeholder="Country *" class="qinput">
-              <input name="address" placeholder="Address" class="qinput sm:col-span-2">
+              <input name="address" required placeholder="Address *" class="qinput sm:col-span-2">
               <input name="company" required placeholder="Company *" class="qinput">
               <select name="companyType" required class="qinput qselect">
-                <option value="" disabled selected>Company type *</option>
-                <option>Corporate / End user</option>
+                <option value="" disabled selected>Company Type *</option>
+                <option>Corporate / End User</option>
                 <option>Reseller / Dealer</option>
                 <option>Architect / Designer</option>
                 <option>Other</option>
               </select>
-              <select name="companySize" required class="qinput qselect sm:col-span-2">
-                <option value="" disabled selected>Company size *</option>
-                <option>1–10</option>
-                <option>11–50</option>
-                <option>51–200</option>
-                <option>201–500</option>
-                <option>500+</option>
-              </select>
+              <textarea name="notes" rows="3" placeholder="Notes" class="qinput sm:col-span-2"></textarea>
             </div>
             <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6">
               <p class="text-xs text-gray-500">By submitting you agree to our <a href="#" class="underline font-medium text-gray-700">Privacy Policy</a>.</p>
