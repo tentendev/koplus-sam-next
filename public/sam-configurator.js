@@ -209,7 +209,7 @@ function SamApp(appConfig) {
   let activeKey = "";
   // Branding for the active line (name + tagline), de-hardcoded from "SAM".
   // Falls back to SAM defaults if the series record is missing a field.
-  let series = { key: seriesKey, name: "SAM", tagline: "Sustainable Acoustic Modular Booth" };
+  let series = { key: seriesKey, name: "", tagline: "" };
 
   fetchCatalogue(apiBase)
     .then(({ products: productDocs, colors, series: seriesDocs }) => {
@@ -221,8 +221,10 @@ function SamApp(appConfig) {
       if (found) {
         series = {
           key: found.key,
-          name: found.name || series.name,
-          tagline: found.tagline || series.tagline
+          name: found.name || "",
+          // Use the CMS value as-is — if it's cleared, the tagline stays empty
+          // (don't fall back to the hardcoded default).
+          tagline: found.tagline || ""
         };
       }
       document.title = `Koplus - ${series.name} Booth Configurator`;
@@ -253,7 +255,7 @@ function SamApp(appConfig) {
      CONFIGURATOR
      ============================================================== */
   function renderConfigurator(config) {
-    const subtitle = config.subtitle || "A self-contained individual studio space designed for private work in an open-plan workspace.";
+    const subtitle = config.subtitle || "";
     // The big series heading already brands the page, so drop any leading series
     // name the CMS title carries — the product title reads e.g. "Large Acoustic Booth".
     // Declared here (not in buildHTML) so the quote handlers can reference it too.
@@ -938,12 +940,12 @@ function SamApp(appConfig) {
         <!-- Series name — aligns with the top edge of the product image on the left. -->
         <div>
           <h1 class="font-['Cal_Sans'] text-[40px] md:text-[52px] lg:text-[64px] font-normal leading-[1.05]" style="color:#0a2240">${series.name}</h1>
-          <p class="font-['Noto_Sans'] text-base font-light leading-snug mt-0.5" style="color:#5b6b7b">${series.tagline}</p>
+          ${series.tagline ? `<p class="font-['Noto_Sans'] text-base font-light leading-snug mt-0.5" style="color:#5b6b7b">${series.tagline}</p>` : ""}
         </div>
 
         <!-- Product title — sits directly below the series tagline and updates with the
              selector. Title text is API-driven (config.title); per-size naming lives in CMS. -->
-        <h2 class="font-['Noto_Sans'] text-[22px] md:text-[26px] lg:text-[30px] font-medium leading-[1.2] mt-2" style="color:#0a2240">${productTitle}</h2>
+        <h2 class="font-['Noto_Sans'] text-[22px] md:text-[26px] lg:text-[30px] font-medium leading-[1.2] -mt-2" style="color:#0a2240">${productTitle}</h2>
 
         <!-- Product selector (Single / Medium / Large) — compact pill with generous
              per-option padding so each segment (incl. the selected one) reads spacious. -->
@@ -954,7 +956,7 @@ function SamApp(appConfig) {
         </div>
 
         <!-- Product description (API-driven subtitle) — Noto Sans Light to match the tagline. -->
-        <p class="font-['Noto_Sans'] text-lg font-light leading-[22px]" style="color:#5b6b7b">${subtitle}</p>
+        ${subtitle ? `<p class="font-['Noto_Sans'] text-lg font-light leading-[22px]" style="color:#5b6b7b">${subtitle}</p>` : ""}
 
         <!-- Divider (replaces the former "Configure" heading). -->
         <div class="border-b border-gray-300"></div>
