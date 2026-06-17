@@ -1151,9 +1151,9 @@ function SamApp(appConfig) {
                 <div class="flex justify-between border-b border-gray-200 py-3"><span class="text-sm font-semibold text-gray-800">Frame</span><span id="qspec-frame" class="text-sm text-gray-500"></span></div>
                 <div class="flex justify-between border-b border-gray-200 py-3"><span class="text-sm font-semibold text-gray-800">Door</span><span id="qspec-door" class="text-sm text-gray-500"></span></div>
                 <div class="flex justify-between border-b border-gray-200 py-3"><span class="text-sm font-semibold text-gray-800">Interior</span><span id="qspec-interior" class="text-sm text-gray-500"></span></div>
-                <div class="flex justify-between border-b border-gray-200 py-3"><span class="text-sm font-semibold text-gray-800">Back Panel</span><span id="qspec-panel" class="text-sm text-gray-500"></span></div>
+                ${config.panels && config.panels.length ? `<div class="flex justify-between border-b border-gray-200 py-3"><span class="text-sm font-semibold text-gray-800">Back Panel</span><span id="qspec-panel" class="text-sm text-gray-500"></span></div>` : ""}
                 <div class="flex justify-between border-b border-gray-200 py-3"><span class="text-sm font-semibold text-gray-800">Exterior</span><span id="qspec-exterior" class="text-sm text-gray-500"></span></div>
-                <div class="flex justify-between border-b border-gray-200 py-3"><span class="text-sm font-semibold text-gray-800">Tabletop Colour</span><span id="qspec-tabletop" class="text-sm text-gray-500"></span></div>
+                ${deskItem ? `<div class="flex justify-between border-b border-gray-200 py-3"><span class="text-sm font-semibold text-gray-800">Tabletop Colour</span><span id="qspec-tabletop" class="text-sm text-gray-500"></span></div>` : ""}
                 <div class="flex items-center justify-between py-3">
                   <span class="text-sm font-semibold text-gray-800">Quantity</span>
                   <div class="flex items-center rounded-lg ring-1 ring-gray-200 overflow-hidden">
