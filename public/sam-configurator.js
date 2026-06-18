@@ -1100,7 +1100,7 @@ function SamApp(appConfig) {
 
   <!-- Sticky bottom configuration summary bar -->
   <div id="cfg-summary-bar" class="fixed bottom-0 left-0 right-0 z-40 border-t border-gray-200 bg-white" style="box-shadow:0 -2px 12px rgba(0,0,0,0.06)">
-    <div class="w-full px-5 sm:px-6 lg:px-8 py-2.5 sm:py-3 flex items-center gap-2 sm:gap-4">
+    <div class="w-full px-5 sm:px-12 lg:px-20 py-2.5 sm:py-3 flex items-center gap-2 sm:gap-4">
       <!-- Left: live product thumbnail + product / live summary -->
       <div class="flex items-center gap-3 flex-1 min-w-0">
         <div id="summary-thumb" class="hidden sm:block relative aspect-[4/3] h-12 rounded-md overflow-hidden shrink-0 ring-1 ring-gray-200 bg-gradient-to-b from-gray-50 to-white">
