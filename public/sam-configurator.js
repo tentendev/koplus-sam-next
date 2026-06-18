@@ -146,6 +146,9 @@ function transformProduct(p) {
     skuTemplate: a.skuTemplate,
     defaultColour: a.defaultColorCode,
     paletteKey: a.palette && a.palette.key,
+    // Which configurator section this accessory's control renders in.
+    // Defaults to the Accessory section. Set per-accessory in the CMS.
+    displaySection: a.displaySection || "accessory",
     excludeCodes: (a.excludedColorCodes || []).map(x => x.code)
   }));
   const panelMissingInteriors = {};
@@ -984,6 +987,7 @@ function SamApp(appConfig) {
                 </div>
               </div>
             </div>
+            ${accessoriesIn("door")}
 
             <!-- Back Panel -->
             <div class="cfg-row rounded-xl ring-1 ring-gray-200 overflow-hidden" data-row="backpanel">
@@ -1006,6 +1010,7 @@ function SamApp(appConfig) {
                 </div>
               </div>
             </div>
+            ${accessoriesIn("backPanel")}
 
           </div>
         </div>
@@ -1032,7 +1037,9 @@ function SamApp(appConfig) {
                 </div>
               </div>
             </div>
+            ${accessoriesIn("exterior")}
             ${renderDeskRow()}
+            ${accessoriesIn("tabletop")}
             <!-- Interior Colour -->
             <div class="cfg-row rounded-xl ring-1 ring-gray-200 overflow-hidden" data-row="interior">
               <button class="cfg-row-header w-full flex items-center justify-between px-4 py-3 text-left">
@@ -1047,11 +1054,12 @@ function SamApp(appConfig) {
                 </div>
               </div>
             </div>
+            ${accessoriesIn("interior")}
 
           </div>
         </div>
 
-        ${optionalAccessories.length ? `
+        ${optionalAccessories.some(a => (a.displaySection || "accessory") === "accessory") ? `
         <!-- ═══ Section: Accessories ═══ -->
         <div class="cfg-section">
           <button class="section-toggle w-full flex items-center justify-between py-2">
@@ -1059,29 +1067,7 @@ function SamApp(appConfig) {
             <span class="section-chevron text-gray-400 transition-transform" style="transform:rotate(180deg)">${ICON_CHEVRON_DOWN}</span>
           </button>
           <div class="section-body space-y-4 pt-2">
-            ${optionalAccessories.map(a => `
-            <div class="cfg-row rounded-xl ring-1 ring-gray-200 overflow-hidden">
-              <button data-acc="${a.code}" class="acc-toggle w-full flex items-center justify-between px-4 py-3 text-left transition hover:bg-gray-50">
-                <div class="text-sm font-semibold text-gray-900">${a.label}</div>
-                <div class="flex items-center gap-2 text-xs font-medium text-gray-500">
-                  <span class="acc-status">Add +</span>
-                </div>
-              </button>
-              ${a.colours && a.colours.length ? `
-              <div class="cfg-row-body acc-colours px-4" data-acc-colours="${a.code}">
-                <div class="text-xs text-gray-500 mb-2">Colour: <span class="acc-colour-label">${(a.colours.find(c => c.code === (a.defaultColour || a.colours[0].code)) || a.colours[0]).name}</span></div>
-                <div class="flex flex-wrap gap-2.5">
-                  ${a.colours.map(c => {
-                    const on = c.code === (a.defaultColour || a.colours[0].code) ? " on" : "";
-                    const unavailable = c.unavailable ? " unavailable" : "";
-                    if (c.swatch && !c.unavailable) {
-                      return `<button data-code="${c.code}" data-name="${c.name}" title="${c.name}" aria-label="${c.name}" class="acc-swatch${on}${unavailable} h-8 w-8 rounded-full border-2 transition" style="border-color:${c.border || c.bg};background-image:url('${c.swatch}')"></button>`;
-                    }
-                    return `<button data-code="${c.code}" data-name="${c.name}" class="acc-swatch${on}${unavailable} h-8 w-8 rounded-full border-2 transition" style="background:${c.bg};border-color:${c.border || c.bg}"></button>`;
-                  }).join("")}
-                </div>
-              </div>` : ''}
-            </div>`).join("")}
+            ${accessoriesIn("accessory")}
           </div>
         </div>` : ''}
 
@@ -1321,6 +1307,42 @@ function SamApp(appConfig) {
                 <div class="text-xs text-gray-400 mt-2">Automatically matched to the exterior color — White exterior uses a white desk surface, all others use black.</div>
               </div>
             </div>`;
+    }
+
+    // One optional-accessory row (toggle + colour swatches). Where it renders is
+    // driven by the accessory's CMS `displaySection` — see accessoriesIn().
+    function renderAccessoryRow(a) {
+      return `
+            <div class="cfg-row rounded-xl ring-1 ring-gray-200 overflow-hidden">
+              <button data-acc="${a.code}" class="acc-toggle w-full flex items-center justify-between px-4 py-3 text-left transition hover:bg-gray-50">
+                <div class="text-sm font-semibold text-gray-900">${a.label}</div>
+                <div class="flex items-center gap-2 text-xs font-medium text-gray-500">
+                  <span class="acc-status">Add +</span>
+                </div>
+              </button>
+              ${a.colours && a.colours.length ? `
+              <div class="cfg-row-body acc-colours px-4" data-acc-colours="${a.code}">
+                <div class="text-xs text-gray-500 mb-2">Colour: <span class="acc-colour-label">${(a.colours.find(c => c.code === (a.defaultColour || a.colours[0].code)) || a.colours[0]).name}</span></div>
+                <div class="flex flex-wrap gap-2.5">
+                  ${a.colours.map(c => {
+                    const on = c.code === (a.defaultColour || a.colours[0].code) ? " on" : "";
+                    const unavailable = c.unavailable ? " unavailable" : "";
+                    if (c.swatch && !c.unavailable) {
+                      return `<button data-code="${c.code}" data-name="${c.name}" title="${c.name}" aria-label="${c.name}" class="acc-swatch${on}${unavailable} h-8 w-8 rounded-full border-2 transition" style="border-color:${c.border || c.bg};background-image:url('${c.swatch}')"></button>`;
+                    }
+                    return `<button data-code="${c.code}" data-name="${c.name}" class="acc-swatch${on}${unavailable} h-8 w-8 rounded-full border-2 transition" style="background:${c.bg};border-color:${c.border || c.bg}"></button>`;
+                  }).join("")}
+                </div>
+              </div>` : ''}
+            </div>`;
+    }
+
+    // Optional accessories assigned to a given section (CMS displaySection).
+    function accessoriesIn(section) {
+      return optionalAccessories
+        .filter(a => (a.displaySection || "accessory") === section)
+        .map(renderAccessoryRow)
+        .join("");
     }
   }
 }
