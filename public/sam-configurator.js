@@ -774,6 +774,20 @@ function SamApp(appConfig) {
       set("#qspec-door",     state.door === "LT" ? "Left Handed" : "Right Handed");
       set("#qspec-panel",    panel && panel.label);
       set("#qspec-tabletop", deskItem ? deskColourName(state.accessoryColours[deskItem.code]) : "—");
+      // Selected accessories — show each row (name + chosen colour), hide the rest.
+      // Rows are direct grid items so they flow and align with the other fields.
+      optionalAccessories.forEach(a => {
+        const row = root.querySelector(`[data-qacc="${a.code}"]`);
+        if (!row) return;
+        if (state.accessories[a.code]) {
+          row.style.display = "";
+          const c = (a.colours || []).find(x => x.code === state.accessoryColours[a.code]);
+          const val = row.querySelector(`[data-qacc-val="${a.code}"]`);
+          if (val) val.textContent = (c && c.name) || "—";
+        } else {
+          row.style.display = "none";
+        }
+      });
     }
 
     // Structured configuration snapshot for the quote payload (mirrors the Payload
@@ -1140,6 +1154,9 @@ function SamApp(appConfig) {
                 ${config.panels && config.panels.length ? `<div class="flex justify-between border-b border-gray-200 py-3"><span class="text-sm font-semibold text-gray-800">Back Panel</span><span id="qspec-panel" class="text-sm text-gray-500"></span></div>` : ""}
                 <div class="flex justify-between border-b border-gray-200 py-3"><span class="text-sm font-semibold text-gray-800">Exterior</span><span id="qspec-exterior" class="text-sm text-gray-500"></span></div>
                 ${deskItem ? `<div class="flex justify-between border-b border-gray-200 py-3"><span class="text-sm font-semibold text-gray-800">Tabletop Colour</span><span id="qspec-tabletop" class="text-sm text-gray-500"></span></div>` : ""}
+                <!-- Optional accessories — each a direct grid row (so they flow/align with the
+                     other fields), shown only when the customer has selected them. -->
+                ${optionalAccessories.map(a => `<div class="flex justify-between border-b border-gray-200 py-3" data-qacc="${a.code}" style="display:none"><span class="text-sm font-semibold text-gray-800">${a.label}</span><span class="text-sm text-gray-500" data-qacc-val="${a.code}"></span></div>`).join("")}
                 <div class="flex items-center justify-between py-3">
                   <span class="text-sm font-semibold text-gray-800">Quantity</span>
                   <div class="flex items-center rounded-lg ring-1 ring-gray-200 overflow-hidden">
