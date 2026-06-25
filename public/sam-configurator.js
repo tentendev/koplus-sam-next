@@ -1133,7 +1133,7 @@ function SamApp(appConfig) {
 
           <!-- Header -->
           <div class="flex items-center justify-between px-6 sm:px-10 py-5 border-b border-gray-200">
-            <img src="/assets/koplus-logo.png" alt="Koplus" class="h-7 w-auto">
+            <img src="/assets/koplus-logo.png" alt="Koplus" class="md:block hidden h-7 w-auto">
             <h2 class="font-['Cal_Sans'] text-2xl md:text-3xl font-normal" style="color:#0a2240">Request a Quote</h2>
             <button id="quote-close" type="button" aria-label="Close" class="hidden text-gray-400 hover:text-gray-700 transition">
               <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
