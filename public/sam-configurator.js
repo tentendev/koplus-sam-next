@@ -166,6 +166,8 @@ function transformProduct(p) {
     skuPrefix: p.skuPrefix,
     assetBase: p.assetBaseUrl,
     allGlassCode: p.allGlassCode,
+    // CMS-set default door orientation for this product (LT/RT); falls back to LT.
+    defaultDoor: p.defaultDoor === "RT" ? "RT" : "LT",
     exteriorPaletteKey: p.exteriorPalette && p.exteriorPalette.key,
     interiorPaletteKey: p.interiorPalette && p.interiorPalette.key,
     layers: deriveLayers(accessoryItems),
@@ -296,7 +298,7 @@ function SamApp(appConfig) {
 
     // ── State ──
     const state = {
-      door:       "LT",
+      door:       config.defaultDoor || "LT",
       exterior:   exteriorPalette[0].code,
       interior:   "BWH",
       panel:      config.panels[0].code
@@ -919,7 +921,7 @@ function SamApp(appConfig) {
        HTML BUILDER
        ============================================================== */
     function buildHTML() {
-      const doorName = "Left Handed";
+      const doorName = state.door === "RT" ? "Right Handed" : "Left Handed";
       const extName  = exteriorPalette[0].name;
       const intName  = "Blended White";
       const panelName = config.panels[0].label;
@@ -996,8 +998,8 @@ function SamApp(appConfig) {
               </button>
               <div class="cfg-row-body px-4">
                 <div class="flex gap-3 pt-2">
-                  <button data-code="LT" data-name="Left Handed" class="door-btn flex-1 rounded-lg ring-2 ring-[#061629] bg-blue-50 px-4 py-3 text-sm font-medium text-center transition">Left Handed</button>
-                  <button data-code="RT" data-name="Right Handed" class="door-btn flex-1 rounded-lg ring-1 ring-gray-200 px-4 py-3 text-sm font-medium text-gray-600 text-center transition hover:ring-gray-400">Right Handed</button>
+                  <button data-code="LT" data-name="Left Handed" class="door-btn flex-1 rounded-lg px-4 py-3 text-sm font-medium text-center transition ${state.door === "LT" ? 'ring-2 ring-[#061629] bg-blue-50' : 'ring-1 ring-gray-200 text-gray-600 hover:ring-gray-400'}">Left Handed</button>
+                  <button data-code="RT" data-name="Right Handed" class="door-btn flex-1 rounded-lg px-4 py-3 text-sm font-medium text-center transition ${state.door === "RT" ? 'ring-2 ring-[#061629] bg-blue-50' : 'ring-1 ring-gray-200 text-gray-600 hover:ring-gray-400'}">Right Handed</button>
                 </div>
               </div>
             </div>
