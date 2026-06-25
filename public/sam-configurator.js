@@ -939,8 +939,8 @@ function SamApp(appConfig) {
     <div class="w-full flex flex-col lg:flex-row gap-10">
 
       <!-- LEFT — Product image -->
-      <div class="lg:w-3/5 lg:sticky lg:top-8 lg:self-start">
-        <div id="pod-image" class="relative rounded-xl lg:rounded-2xl bg-gradient-to-b from-gray-50 to-white aspect-[4/3] overflow-hidden">
+      <div class="lg:w-3/5 lg:sticky lg:top-0 lg:self-start lg:h-screen lg:flex lg:flex-col lg:justify-center lg:bg-[#fafbfc]">
+        <div id="pod-image" class="relative w-full rounded-xl lg:rounded-2xl bg-[#fafbfc] aspect-[4/3] lg:aspect-auto lg:h-[85vh] overflow-hidden">
           ${config.layers.map(l =>
             `<img id="layer-${l.key}" class="pod-layer absolute inset-0 h-full w-full object-contain" style="z-index:${l.zIndex}; opacity:0" src="" alt="${l.key} layer">`
           ).join("\n          ")}
@@ -1105,7 +1105,7 @@ function SamApp(appConfig) {
     <div class="w-full px-5 sm:px-12 lg:px-20 py-2.5 sm:py-3 flex items-center gap-2 sm:gap-4">
       <!-- Left: live product thumbnail + product / live summary -->
       <div class="flex items-center gap-3 flex-1 min-w-0">
-        <div id="summary-thumb" class="hidden sm:block relative aspect-[4/3] h-12 rounded-md overflow-hidden shrink-0 ring-1 ring-gray-200 bg-gradient-to-b from-gray-50 to-white">
+        <div id="summary-thumb" class="hidden sm:block relative aspect-[4/3] h-12 rounded-md overflow-hidden shrink-0 ring-1 ring-gray-200 bg-[#fafbfc]">
           ${config.layers.map(l =>
             `<img id="thumb-${l.key}" class="pod-layer absolute inset-0 h-full w-full object-contain" style="z-index:${l.zIndex}; opacity:0" src="" alt="">`
           ).join("")}
@@ -1146,7 +1146,7 @@ function SamApp(appConfig) {
           <div id="quote-details" class="px-6 sm:px-10 pt-6">
             <div class="flex flex-col sm:flex-row gap-6">
               <div class="shrink-0 w-full sm:w-auto">
-                <div id="qmodal-thumb" class="relative aspect-[4/3] sm:aspect-square w-full sm:w-64 rounded-xl ring-1 ring-gray-200 overflow-hidden bg-gradient-to-b from-gray-50 to-white"></div>
+                <div id="qmodal-thumb" class="relative aspect-[4/3] sm:aspect-square w-full sm:w-64 rounded-xl ring-1 ring-gray-200 overflow-hidden bg-[#fafbfc]"></div>
                 <div class="mt-3 font-['Noto_Sans'] text-lg font-medium text-center sm:text-left" style="color:#0a2240">${series.name} ${productTitle}</div>
               </div>
               <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-x-10 sm:self-start">
