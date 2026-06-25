@@ -1276,9 +1276,6 @@ function SamApp(appConfig) {
       background-repeat:no-repeat; background-position:right 1rem center; background-size:1.1rem;
     }
     #img-placeholder.hidden { display: flex !important; opacity: 0; pointer-events: none; }
-    /* Source renders come in a touch dark — lift the composited product.
-       Stop-gap until/unless Koplus re-exports brighter layers. Tune here. */
-    .pod-layer { filter: brightness(1.15); }
   </style>`;
     }
 
