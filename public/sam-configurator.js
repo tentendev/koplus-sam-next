@@ -296,6 +296,18 @@ function SamApp(appConfig) {
       return c ? c.name : (code === "WH" ? "White" : "Black");
     }
 
+    // Floor PET colour — not user-selectable; auto-assigned from the Interior PET colour
+    // (the floor is baked into the interior render, so it tracks the interior).
+    // Blended White (BWH) or Light Grey (LTG) → Light Grey (LTG); anything else → Dark Grey (DKG).
+    // Reuses the Interior PET palette's Light/Dark Grey swatches.
+    function floorColour() {
+      return (state.interior === "BWH" || state.interior === "LTG") ? "LTG" : "DKG";
+    }
+    function floorColourName(code) {
+      const c = interiorPalette.find(x => x.code === code);
+      return c ? c.name : (code === "LTG" ? "Light Grey" : "Dark Grey");
+    }
+
     // ── State ──
     const state = {
       door:       config.defaultDoor || "LT",
@@ -373,6 +385,7 @@ function SamApp(appConfig) {
     const exteriorSec  = root.querySelector('[data-row="exterior"]');
     const interiorSec  = root.querySelector('[data-row="interior"]');
     const deskSec      = root.querySelector('[data-row="desk"]');
+    const floorSec     = root.querySelector('[data-row="floor"]');
 
     // ── Accordion logic ──
     root.querySelectorAll(".cfg-row-header").forEach(header => {
@@ -571,11 +584,17 @@ function SamApp(appConfig) {
         // Interior colour also paints the back-panel walls — swap both
         // layers together so they never appear out of sync.
         if (stateKey === "interior") {
+          // Floor PET is locked to the interior colour — keep its swatch in sync.
+          applyFloorBinding();
           loadLayers(["interior", "panel"]);
-        } else if (stateKey === "exterior" && deskItem) {
-          // Desk surface is locked to the exterior colour — rebind and swap together.
-          applyDeskBinding();
-          loadLayers(["exterior", "accDesk"]);
+        } else if (stateKey === "exterior") {
+          if (deskItem) {
+            // Desk surface is locked to the exterior — rebind and swap together.
+            applyDeskBinding();
+            loadLayers(["exterior", "accDesk"]);
+          } else {
+            loadLayer("exterior");
+          }
         } else {
           loadLayer(layerKey);
         }
@@ -591,6 +610,16 @@ function SamApp(appConfig) {
       if (deskSec) {
         deskSec.querySelectorAll(".desk-swatch").forEach(s =>
           s.classList.toggle("on", s.dataset.code === code));
+      }
+    }
+
+    // Keep the locked Floor PET colour in sync with the current interior colour.
+    function applyFloorBinding() {
+      state.floor = floorColour();
+      updateRowSummary("floor", floorColourName(state.floor));
+      if (floorSec) {
+        floorSec.querySelectorAll(".floor-swatch").forEach(s =>
+          s.classList.toggle("on", s.dataset.code === state.floor));
       }
     }
 
@@ -729,6 +758,8 @@ function SamApp(appConfig) {
       // Interior PET Colour
       const intP = interiorPalette.find(c => c.code === state.interior);
       if (intP) parts.push(`${intP.name} interior`);
+      // Floor PET Colour (auto-assigned from the interior)
+      parts.push(`${floorColourName(floorColour())} floor`);
       // Accessory (optional add-ons)
       optionalAccessories.forEach(a => {
         if (!state.accessories[a.code]) return;
@@ -770,9 +801,10 @@ function SamApp(appConfig) {
       const intP  = interiorPalette.find(c => c.code === state.interior);
       const panel = config.panels.find(p => p.code === state.panel);
       const set = (id, val) => { const el = root.querySelector(id); if (el) el.textContent = val || "—"; };
-      set("#qspec-frame",    ext && ext.name);
+      set("#qspec-frame",    "-"); // SAM has no outer frame.
       set("#qspec-exterior", ext && ext.name);
       set("#qspec-interior", intP && intP.name);
+      set("#qspec-floor",    floorColourName(floorColour()));
       set("#qspec-door",     state.door === "LT" ? "Left Handed" : "Right Handed");
       set("#qspec-panel",    panel && panel.label);
       set("#qspec-tabletop", deskItem ? deskColourName(state.accessoryColours[deskItem.code]) : "—");
@@ -810,6 +842,7 @@ function SamApp(appConfig) {
         backPanel: panel ? panel.label : "",
         exterior: ext ? ext.name : "",
         interior: intP ? intP.name : "",
+        floor: floorColourName(floorColour()),
         tabletop: deskItem ? deskColourName(state.accessoryColours[deskItem.code]) : "",
         accessories: accNames.join(", "),
       };
@@ -1070,6 +1103,7 @@ function SamApp(appConfig) {
                 </div>
               </div>
             </div>
+            ${renderFloorRow()}
             ${accessoriesIn("interior")}
 
           </div>
@@ -1151,10 +1185,11 @@ function SamApp(appConfig) {
               </div>
               <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-x-10 sm:self-start">
                 <div class="flex justify-between border-b border-gray-200 py-3"><span class="text-sm font-semibold text-gray-800">Frame</span><span id="qspec-frame" class="text-sm text-gray-500"></span></div>
-                <div class="flex justify-between border-b border-gray-200 py-3"><span class="text-sm font-semibold text-gray-800">Door</span><span id="qspec-door" class="text-sm text-gray-500"></span></div>
-                <div class="flex justify-between border-b border-gray-200 py-3"><span class="text-sm font-semibold text-gray-800">Interior</span><span id="qspec-interior" class="text-sm text-gray-500"></span></div>
-                ${config.panels && config.panels.length ? `<div class="flex justify-between border-b border-gray-200 py-3"><span class="text-sm font-semibold text-gray-800">Back Panel</span><span id="qspec-panel" class="text-sm text-gray-500"></span></div>` : ""}
                 <div class="flex justify-between border-b border-gray-200 py-3"><span class="text-sm font-semibold text-gray-800">Exterior</span><span id="qspec-exterior" class="text-sm text-gray-500"></span></div>
+                <div class="flex justify-between border-b border-gray-200 py-3"><span class="text-sm font-semibold text-gray-800">Interior</span><span id="qspec-interior" class="text-sm text-gray-500"></span></div>
+                <div class="flex justify-between border-b border-gray-200 py-3"><span class="text-sm font-semibold text-gray-800">Floor PET Colour</span><span id="qspec-floor" class="text-sm text-gray-500"></span></div>
+                <div class="flex justify-between border-b border-gray-200 py-3"><span class="text-sm font-semibold text-gray-800">Door</span><span id="qspec-door" class="text-sm text-gray-500"></span></div>
+                ${config.panels && config.panels.length ? `<div class="flex justify-between border-b border-gray-200 py-3"><span class="text-sm font-semibold text-gray-800">Back Panel</span><span id="qspec-panel" class="text-sm text-gray-500"></span></div>` : ""}
                 ${deskItem ? `<div class="flex justify-between border-b border-gray-200 py-3"><span class="text-sm font-semibold text-gray-800">Tabletop Colour</span><span id="qspec-tabletop" class="text-sm text-gray-500"></span></div>` : ""}
                 <!-- Optional accessories — each a direct grid row (so they flow/align with the
                      other fields), shown only when the customer has selected them. -->
@@ -1205,7 +1240,7 @@ function SamApp(appConfig) {
               <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="m5 13 4 4L19 7"/></svg>
             </div>
             <h3 class="mt-6 font-['Cal_Sans'] text-2xl md:text-3xl font-normal" style="color:#0a2240">Thank you!</h3>
-            <p class="mt-3 font-['Noto_Sans'] font-light text-base text-gray-500 max-w-md mx-auto">Your quote request has been received. Our team will be in touch shortly.</p>
+            <p class="mt-3 font-['Noto_Sans'] font-light text-base text-gray-500 max-w-md mx-auto">Thank you for your interest in KOPLUS products. Your inquiry has been received successfully.<br /> Our sales team will get back to you with the relevant quotation details within 1&ndash;2 business days.</p>
             <button id="quote-done" type="button" class="mt-8 inline-flex items-center gap-2 px-8 py-3 text-sm font-medium text-white rounded-full transition hover:opacity-90" style="background:#061629">Done</button>
           </div>
 
@@ -1226,9 +1261,9 @@ function SamApp(appConfig) {
     /* Fabric swatch render: zoom the texture in place by sizing the background
        larger than the swatch and centering it. Same effect koplus.com uses. */
     .acc-swatch { background-size: 90px; background-position: 50%; background-repeat: no-repeat; }
-    .desk-swatch { display:inline-block; cursor:not-allowed; }
-    .desk-swatch.on { box-shadow:0 0 0 2px #fff, 0 0 0 3px #061629; }
-    .desk-swatch:not(.on) { opacity:.3; }
+    .desk-swatch, .floor-swatch { display:inline-block; cursor:not-allowed; }
+    .desk-swatch.on, .floor-swatch.on { box-shadow:0 0 0 2px #fff, 0 0 0 3px #061629; }
+    .desk-swatch:not(.on), .floor-swatch:not(.on) { opacity:.3; }
     .swatch.unavailable, .acc-swatch.unavailable {
       background: #d8d4cc !important;
       border-color: #bfb9ae !important;
@@ -1321,6 +1356,36 @@ function SamApp(appConfig) {
                   ${swatches}
                 </div>
                 <div class="text-xs text-gray-400 mt-2">Automatically matched to the exterior color — White exterior uses a white desk surface, all others use black.</div>
+              </div>
+            </div>`;
+    }
+
+    // Floor PET row (standard; colour locked to the interior). Display-only swatches.
+    function renderFloorRow() {
+      const active = floorColour();
+      const swatches = ["LTG", "DKG"].map(code => {
+        const c = interiorPalette.find(x => x.code === code);
+        if (!c) return "";
+        const on = code === active ? " on" : "";
+        return `<span data-code="${code}" title="${c.name}" class="floor-swatch${on} h-9 w-9 rounded-full border-2" style="background:${c.bg};border-color:${c.border || c.bg}"></span>`;
+      }).join("\n                  ");
+      return `
+            <!-- Floor PET (standard; colour locked to interior) -->
+            <div class="cfg-row rounded-xl ring-1 ring-gray-200 overflow-hidden" data-row="floor">
+              <button class="cfg-row-header w-full flex items-center justify-between px-4 py-3 text-left">
+                <div>
+                  <div class="text-sm font-semibold text-gray-900">Floor PET Colour</div>
+                  <div class="row-value text-xs text-gray-500">${floorColourName(active)}</div>
+                </div>
+                <div class="flex items-center gap-1.5 text-gray-400 text-xs font-medium">
+                  Auto ${ICON_LOCK}
+                </div>
+              </button>
+              <div class="cfg-row-body px-4">
+                <div class="flex flex-wrap gap-2.5 pt-2">
+                  ${swatches}
+                </div>
+                <div class="text-xs text-gray-400 mt-2">Automatically matched to the exterior colour — White or Graphite Grey use Light Grey, all others use Dark Grey.</div>
               </div>
             </div>`;
     }
