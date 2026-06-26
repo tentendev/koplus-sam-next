@@ -1263,6 +1263,8 @@ function SamApp(appConfig) {
     .acc-swatch { background-size: 90px; background-position: 50%; background-repeat: no-repeat; }
     .desk-swatch, .floor-swatch { display:inline-block; cursor:not-allowed; }
     .desk-swatch.on, .floor-swatch.on { box-shadow:0 0 0 2px #fff, 0 0 0 3px #061629; }
+    /* Non-selected locked swatches (tabletop + floor) are dimmed to show
+       they're auto-derived and not individually selectable. */
     .desk-swatch:not(.on), .floor-swatch:not(.on) { opacity:.3; }
     .swatch.unavailable, .acc-swatch.unavailable {
       background: #d8d4cc !important;
@@ -1367,6 +1369,11 @@ function SamApp(appConfig) {
         const c = interiorPalette.find(x => x.code === code);
         if (!c) return "";
         const on = code === active ? " on" : "";
+        // Use the same felt-texture swatch image as the Interior PET row so the
+        // two rows match exactly; fall back to the flat colour if no image.
+        if (c.swatch) {
+          return `<span data-code="${code}" title="${c.name}" class="floor-swatch${on} h-9 w-9 rounded-full border-2 overflow-hidden" style="border-color:${c.border || c.bg}"><img src="${c.swatch}" alt="${c.name}" class="h-full w-full object-cover rounded-full"></span>`;
+        }
         return `<span data-code="${code}" title="${c.name}" class="floor-swatch${on} h-9 w-9 rounded-full border-2" style="background:${c.bg};border-color:${c.border || c.bg}"></span>`;
       }).join("\n                  ");
       return `
@@ -1385,7 +1392,7 @@ function SamApp(appConfig) {
                 <div class="flex flex-wrap gap-2.5 pt-2">
                   ${swatches}
                 </div>
-                <div class="text-xs text-gray-400 mt-2">Automatically matched to the exterior colour — White or Graphite Grey use Light Grey, all others use Dark Grey.</div>
+                <div class="text-xs text-gray-400 mt-2">Automatically matched to the Interior PET — Blended White and Light Grey use Light Grey, all others use Dark Grey.</div>
               </div>
             </div>`;
     }
