@@ -37,7 +37,7 @@ const LOCAL_SWATCH_IMAGES = {
 // variants) without a code change or redeploy — just replace this file on S3
 // (same path + name) and make it public. Falls back to the bundled copy if the
 // S3 object is missing, so the header never renders without a logo.
-const LOGO_URL = "https://kolo-website.s3.eu-west-1.amazonaws.com/SamWebp/brand/koplus-logo.png";
+const LOGO_URL = "https://kolo-website.s3.eu-west-1.amazonaws.com/SamWebp/brand/koplus-logo.webp";
 const LOGO_FALLBACK = "/assets/koplus-logo.png";
 const LOGO_ONERROR = `this.onerror=null;this.src='${LOGO_FALLBACK}'`;
 
