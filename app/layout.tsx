@@ -35,6 +35,18 @@ export default function RootLayout({
           src="https://cdn.tailwindcss.com"
           strategy="beforeInteractive"
         />
+        {/* Google tag (gtag.js) — GA4 property G-1NE4ZT9T7G. Reports to the same
+            GA4 as koplus.com so configurator traffic + conversions roll up together. */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-1NE4ZT9T7G"
+          strategy="afterInteractive"
+        />
+        <Script id="ga4-gtag" strategy="afterInteractive">
+          {`window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-1NE4ZT9T7G');`}
+        </Script>
       </head>
       <body className="min-h-screen bg-white text-gray-900">{children}</body>
     </html>

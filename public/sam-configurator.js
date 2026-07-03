@@ -931,6 +931,16 @@ function SamApp(appConfig) {
             body: JSON.stringify(payload),
           });
           if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+          // GA4 conversion — a successful quote request is the key conversion.
+          // Mark "generate_lead" as a Key event / conversion in GA4. Guarded so a
+          // missing gtag (e.g. analytics blocked) never breaks the submission.
+          if (typeof window.gtag === "function") {
+            window.gtag("event", "generate_lead", {
+              product: payload.product,
+              product_slug: payload.productSlug,
+              quantity: payload.quantity,
+            });
+          }
           // Replace the summary + form with the in-modal success state.
           root.querySelector("#quote-details").classList.add("hidden");
           quoteForm.classList.add("hidden");
