@@ -1,0 +1,84 @@
+# Tracking Monitor — guards against silent analytics loss on configurator.koplus.com.
+#
+# Why this exists: on 2026-07-22 the production domain was serving an un-tagged
+# build, so GA4 and the generate_lead conversion recorded NOTHING for real
+# visitors — with no error and no alert. This job re-runs that check on a
+# schedule and fails (emailing the repo's watchers) the moment the GA4 tag or
+# the conversion event disappears from production again.
+#
+# Alerting: GitHub emails the people watching this repo when a *scheduled* run
+# fails. No extra services required. (Optional Slack step is stubbed below.)
+
+name: Tracking Monitor
+
+on:
+  schedule:
+    - cron: "0 8 * * *" # daily at 08:00 UTC — safety net for non-deploy failures
+  push:
+    branches: [main] # verify right after each deploy (the most likely failure point)
+  workflow_dispatch: {} # lets you run it on demand from the Actions tab
+
+# Avoid overlapping runs if one is slow.
+concurrency:
+  group: tracking-monitor
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      PAGE_URL: "https://configurator.koplus.com/"
+      WIDGET_URL: "https://configurator.koplus.com/sam-configurator.js"
+      GA4_ID: "G-1NE4ZT9T7G"
+      CONVERSION_EVENT: "generate_lead"
+    steps:
+      - name: Assert GA4 tag and conversion are live
+        shell: bash
+        run: |
+          set -uo pipefail
+          fail=0
+          cb="$(date +%s)"
+
+          echo "→ Checking page for GA4 tag ($GA4_ID)"
+          # -L follows the / -> /sam redirect; cache-bust to dodge any CDN cache.
+          page="$(curl -fsSL --max-time 25 -A "tracking-monitor" "${PAGE_URL}?cb=${cb}" || true)"
+          if [ -z "$page" ]; then
+            echo "::error title=Page unreachable::Could not fetch ${PAGE_URL}"
+            fail=1
+          elif ! grep -q "$GA4_ID" <<<"$page"; then
+            echo "::error title=GA4 tag missing::'${GA4_ID}' not found on ${PAGE_URL} — analytics is NOT loading in production."
+            fail=1
+          else
+            echo "  ✓ GA4 tag present"
+          fi
+
+          echo "→ Checking widget for conversion event ($CONVERSION_EVENT)"
+          widget="$(curl -fsSL --max-time 25 -A "tracking-monitor" "${WIDGET_URL}?cb=${cb}" || true)"
+          if [ -z "$widget" ]; then
+            echo "::error title=Widget unreachable::Could not fetch ${WIDGET_URL}"
+            fail=1
+          elif ! grep -q "$CONVERSION_EVENT" <<<"$widget"; then
+            echo "::error title=Conversion missing::'${CONVERSION_EVENT}' not found in ${WIDGET_URL} — quote submissions are NOT being tracked."
+            fail=1
+          else
+            echo "  ✓ Conversion event present"
+          fi
+
+          if [ "$fail" -ne 0 ]; then
+            echo ""
+            echo "Tracking check FAILED — production is not fully instrumented. See errors above."
+            exit 1
+          fi
+          echo ""
+          echo "All tracking checks passed."
+
+      # --- Optional: Slack alert on failure -------------------------------------
+      # Add a repo secret named SLACK_WEBHOOK_URL, then uncomment this step.
+      # - name: Notify Slack on failure
+      #   if: failure()
+      #   shell: bash
+      #   run: |
+      #     curl -fsS -X POST -H 'Content-type: application/json' \
+      #       --data '{"text":"🚨 configurator.koplus.com tracking check failed — GA4 tag or generate_lead is missing in production. See the failed GitHub Action run."}' \
+      #       "${{ secrets.SLACK_WEBHOOK_URL }}"
