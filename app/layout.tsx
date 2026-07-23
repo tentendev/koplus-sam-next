@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
 import ConsentBanner from "@/components/ConsentBanner";
+import { SITE_URL } from "@/lib/config";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "Koplus Booth Configurator",
   icons: { icon: "/assets/koplus-favicon.png" },
 };

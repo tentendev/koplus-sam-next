@@ -30,7 +30,10 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { series } = await params;
   const doc = await getSeries(series.toLowerCase());
-  return { title: `Koplus - ${doc?.name ?? "Booth"} Booth Configurator` };
+  return {
+    title: `Koplus - ${doc?.name ?? "Booth"} Booth Configurator`,
+    alternates: { canonical: `/${series.toLowerCase()}` },
+  };
 }
 
 export default async function SeriesPage({
