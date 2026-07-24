@@ -1,0 +1,208 @@
+{
+  "report": {
+    "title": "KOPLUS Configurator SEO 結案暨下一階段提案報告",
+    "domain": "https://configurator.koplus.com",
+    "audit_date": "2026-07-23",
+    "timezone": "Asia/Taipei",
+    "repository_commit": "af527fb",
+    "health_score": 61,
+    "score_note": "依 claude-seo v2.2.4 權重計算之稽核啟發式分數，不是 Google 排名分數。"
+  },
+  "scope": {
+    "canonical_urls_in_sitemap": 2,
+    "primary_url": "https://configurator.koplus.com/sam",
+    "secondary_url": "https://configurator.koplus.com/sam-copy",
+    "sources": [
+      "本地 Next.js 專案原始碼與 Git 狀態",
+      "正式站 HTTP 回應、標頭、robots.txt、sitemap.xml 與渲染後 DOM",
+      "Lighthouse 13.4.1 行動版單次實驗室測試",
+      "使用者提供的 Google Search Console、Bing Webmaster、Agent-Ready 截圖"
+    ]
+  },
+  "scores": [
+    {
+      "category": "Technical SEO",
+      "score": 82,
+      "weight": 22
+    },
+    {
+      "category": "Content Quality",
+      "score": 62,
+      "weight": 23
+    },
+    {
+      "category": "On-Page SEO",
+      "score": 60,
+      "weight": 20
+    },
+    {
+      "category": "Schema / Structured Data",
+      "score": 0,
+      "weight": 10
+    },
+    {
+      "category": "Performance",
+      "score": 47,
+      "weight": 10
+    },
+    {
+      "category": "AI Search Readiness",
+      "score": 86,
+      "weight": 10
+    },
+    {
+      "category": "Images",
+      "score": 58,
+      "weight": 5
+    }
+  ],
+  "lighthouse_mobile": {
+    "version": "13.4.1",
+    "fetch_time_utc": "2026-07-23T07:43:39.543Z",
+    "url": "https://configurator.koplus.com/sam",
+    "scores": {
+      "performance": 47,
+      "accessibility": 90,
+      "best_practices": 100,
+      "seo": 92
+    },
+    "metrics": {
+      "FCP": "3.6 s",
+      "LCP": "8.5 s",
+      "TBT": "780 ms",
+      "CLS": "0",
+      "Speed Index": "4.6 s",
+      "TTI": "9.2 s",
+      "Total payload": "11,076 KiB",
+      "Unused JavaScript opportunity": "167 KiB",
+      "Image delivery opportunity": "519 KiB"
+    },
+    "limitations": "單次行動版 lab 測試；不是 28 天 CrUX 欄位資料，且不等同 INP。"
+  },
+  "platform_status": [
+    {
+      "platform": "Google Search Console",
+      "status": "已串接；sitemap 成功",
+      "evidence": "2026-07-23 截圖顯示 configurator sitemap 為 Success，發現 2 個頁面。"
+    },
+    {
+      "platform": "Bing Webmaster Tools",
+      "status": "已串接；sitemap 處理中",
+      "evidence": "2026-07-23 截圖顯示 configurator sitemap 為 Processing；不得寫成收錄成功。"
+    },
+    {
+      "platform": "GA4",
+      "status": "程式與正式站載入已驗證",
+      "evidence": "G-1NE4ZT9T7G、Consent Mode v2、page_view collect request、generate_lead 程式碼與每日監控 workflow 均存在；本次未取得 GA4 後台報表截圖。"
+    },
+    {
+      "platform": "Agent-Ready",
+      "status": "86 / Level 5 Agent-Native",
+      "evidence": "使用者截圖為 partial scan，僅啟用 7/19 checks；Discoverability 75、Content 100、Bot Access Control 100。"
+    }
+  ],
+  "completed_foundation": [
+    "robots.txt 回傳 200 text/plain，含一般與 AI crawler 明確規則",
+    "sitemap.xml 回傳 200 application/xml，並由 CMS 系列資料生成",
+    "首頁與資源端點提供 RFC 8288 Link discovery headers",
+    "HTML 預設不變，Accept: text/markdown 可取得 Markdown 表示",
+    "API catalog、OpenAPI、service docs、agent index 均可公開存取",
+    "Content-Signal 宣告 ai-train=no、search=yes、ai-input=yes",
+    "DNS-AID SVCB/TYPE64 已可由公共 resolver 查得",
+    "Cloudflare zone 已有 DNSKEY 與 RRSIG；registrar DS 尚未建立完整 DNSSEC 信任鏈",
+    "Google Search Console、Bing Webmaster 與 GA4 基礎串接已建立"
+  ],
+  "findings": [
+    {
+      "priority": "P1",
+      "title": "移除或封存 /sam-copy",
+      "evidence": "網址回傳 200 且位於 sitemap，但渲染顯示 Unable to load configurator / No products found for series sam-copy；Markdown 也沒有模型資料。",
+      "action": "若是測試資料，從 CMS 發布集合與 sitemap 移除並回 404/410；若要保留，必須補齊產品、內容與可用互動流程。",
+      "failure_test": "Search Console 或 Bing 仍發現 /sam-copy，或 URL 仍以 200 顯示錯誤狀態。",
+      "leading_indicator": "sitemap 只保留可完成配置的 canonical URL。"
+    },
+    {
+      "priority": "P1",
+      "title": "把主要產品文字與連結改為伺服器端輸出",
+      "evidence": "/sam 初始 HTML 只有約 4 個可見英文字，無 H1；渲染後才有 236 字、1 個 H1 與產品內容。",
+      "action": "在 Next.js Server Component 先輸出系列名稱、三個模型摘要、核心規格與可爬連結，再由 Configurator client enhancement 接管互動。",
+      "failure_test": "關閉 JavaScript 後仍看不到主要產品資訊，或 HTML 原始碼仍無 H1/正文。",
+      "leading_indicator": "原始 HTML 可直接抽取 title、description、H1、模型摘要與內部連結。"
+    },
+    {
+      "priority": "P1",
+      "title": "停止首屏後立即預載全部材質變體",
+      "evidence": "Lighthouse 行動版總 payload 11,076 KiB；AWS 圖層傳輸約 8.16 MB。程式 prefetchVariants() 會一次預抓門、外觀、內裝、背板與配件的所有變體。",
+      "action": "只載入首屏實際圖層；其餘改為 requestIdleCallback 分批、滑鼠/觸控意圖預取、或選項鄰近預取，並設定資料量上限。",
+      "failure_test": "冷啟動仍下載超過 3 MB，或 Lighthouse mobile LCP 仍高於 4 秒。",
+      "leading_indicator": "首屏請求數、影像位元組與 LCP 同步下降。"
+    },
+    {
+      "priority": "P1",
+      "title": "補齊 meta description 與分享 metadata",
+      "evidence": "/sam 與 /sam-copy 均無 meta description、Open Graph、Twitter card；Lighthouse meta-description audit 失敗。",
+      "action": "由 CMS 系列與模型資料生成唯一 description、og:title、og:description、og:image 與 twitter card。",
+      "failure_test": "正式站原始 HTML 仍找不到唯一 description，或分享除錯工具無法預覽。",
+      "leading_indicator": "GSC 查詢頁面 CTR 與分享預覽覆蓋率。"
+    },
+    {
+      "priority": "P2",
+      "title": "加入真實且可維護的 JSON-LD",
+      "evidence": "原始與渲染 HTML 均未偵測到 application/ld+json。",
+      "action": "先加入 Organization / WebSite；對可公開的產品模型加入 Product 或 ProductGroup，僅輸出畫面上可見且由 CMS 維護的欄位，不虛構價格、庫存或評價。",
+      "failure_test": "Rich Results Test 出錯，或結構化資料與頁面可見內容不一致。",
+      "leading_indicator": "有效結構化資料 URL 數與 Search Console enhancement 狀態。"
+    },
+    {
+      "priority": "P2",
+      "title": "改善圖像尺寸與 LCP 發現",
+      "evidence": "23 張渲染圖片皆有 alt，但都沒有 width/height；LCP 圖層不在初始 HTML、無 fetchpriority=high。Lighthouse 估計可節省 519 KiB。",
+      "action": "輸出 480/768/1200 尺寸變體與 srcset/sizes；首張實際 LCP 圖設 fetchpriority=high，非必要圖層延後載入，圖片容器保留 aspect-ratio。",
+      "failure_test": "Lighthouse 仍報 LCP discovery 與 image delivery opportunity。",
+      "leading_indicator": "LCP 資源可在初始 HTML 被發現，影像節省量趨近 0。"
+    },
+    {
+      "priority": "P2",
+      "title": "移除 production Tailwind CDN 並縮減 JS",
+      "evidence": "正式站在 beforeInteractive 載入 cdn.tailwindcss.com；未使用 JS 估計 167 KiB，主執行緒工作 2.8 秒。",
+      "action": "把所需 utility 編譯進正式 CSS；延後 GA4 與非首屏互動程式，拆分 configurator 初始化階段。",
+      "failure_test": "production network waterfall 仍出現 Tailwind CDN，或 TBT 仍高於 600 ms。",
+      "leading_indicator": "JS transfer、TBT、main-thread work。"
+    },
+    {
+      "priority": "P2",
+      "title": "修正可及性與信任細節",
+      "evidence": "Lighthouse accessibility 90，但色票按鈕缺少 accessible name、部分色彩對比不足；quote form 以 placeholder 代替 label；Privacy Policy 連結為 #。",
+      "action": "為色票補 aria-label/aria-pressed、表單補 label/for、修正對比，並連到正式隱私權頁面。",
+      "failure_test": "Lighthouse button-name / color-contrast 仍失敗，或鍵盤與讀屏無法完成詢價。",
+      "leading_indicator": "Accessibility 100、表單完成率與錯誤率。"
+    },
+    {
+      "priority": "P3",
+      "title": "補齊安全標頭與 DNSSEC 信任鏈",
+      "evidence": "目前可見 HSTS，但未見 CSP、X-Content-Type-Options、Referrer-Policy；koplus.com DNSKEY/RRSIG 存在，但公共 resolver 查不到 DS。",
+      "action": "在 Vercel/Next headers 加入合適 CSP、nosniff、Referrer-Policy；至網域註冊商加入 Cloudflare DS。",
+      "failure_test": "安全標頭掃描仍缺失，或 DNSSEC 驗證仍無完整 DS chain。",
+      "leading_indicator": "DNSSEC AD 驗證與安全標頭覆蓋率。"
+    }
+  ],
+  "validation": {
+    "typescript": "PASS",
+    "production_build": "PASS",
+    "lint": "FAIL — 1 existing error and 3 warnings",
+    "lint_detail": "components/ConsentBanner.tsx:52 setState-in-effect；其餘為字型與未使用變數警告。",
+    "public_endpoints": "PASS",
+    "robots": "200 text/plain",
+    "sitemap": "200 application/xml",
+    "invalid_series": "404",
+    "http_to_https": "308",
+    "trailing_slash": "308 to canonical path"
+  },
+  "limitations": [
+    "本次未連線 GSC、Bing、GA4 API，因此沒有查詢字詞、曝光、點擊、CTR、索引覆蓋、自然流量與轉換趨勢。",
+    "Bing 截圖的 configurator sitemap 是 Processing；只可確認已串接與已提交，不能宣稱收錄成功。",
+    "Agent-Ready 截圖是 partial scan，只有 7/19 checks；86 分不代表完整檢查。",
+    "Lighthouse 為單次行動版實驗室測試；Core Web Vitals 的正式判定應以 28 天 CrUX / Search Console p75 欄位資料為準。",
+    "未進行關鍵字、SERP、競品、外鏈與品牌聲量資料採購，因此報告不估算排名或流量成長幅度。"
+  ]
+}

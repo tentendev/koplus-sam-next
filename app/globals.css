@@ -18,3 +18,15 @@ body {
     transform: translateY(0);
   }
 }
+
+/* Keep the configurator usable without motion for visitors who opt out. */
+@media (prefers-reduced-motion: reduce) {
+  .sam-motion-root *,
+  .sam-motion-root *::before,
+  .sam-motion-root *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

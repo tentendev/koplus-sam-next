@@ -132,8 +132,11 @@ function buildPalettesFromApi(colors) {
 // Layers render bottom-to-top by zIndex.
 function deriveLayers(accessories) {
   const layers = [
-    { key: "panel",    folder: "panel",    zIndex: 1 },
-    { key: "interior", folder: "interior", zIndex: 2 }
+    // L5 panel variants must sit above L4 interior. Full-wall L5 assets include
+    // the complete wall render, while glass/partial-wall variants leave the
+    // remaining interior transparent so L4 can show through.
+    { key: "interior", folder: "interior", zIndex: 1 },
+    { key: "panel",    folder: "panel",    zIndex: 2 }
   ];
   (accessories || []).forEach(a => {
     if (a.layerKey) {
@@ -877,8 +880,14 @@ function SamApp(appConfig) {
       }
       quoteModal.classList.remove("hidden");
       document.body.style.overflow = "hidden";
+      quoteModal.dispatchEvent(new CustomEvent("sam:quote-open", { bubbles: true }));
     }
     function closeQuote() {
+      const closeEvent = new CustomEvent("sam:quote-close", {
+        bubbles: true,
+        cancelable: true,
+      });
+      if (!quoteModal.dispatchEvent(closeEvent)) return;
       quoteModal.classList.add("hidden");
       document.body.style.overflow = "";
     }
@@ -944,7 +953,9 @@ function SamApp(appConfig) {
           // Replace the summary + form with the in-modal success state.
           root.querySelector("#quote-details").classList.add("hidden");
           quoteForm.classList.add("hidden");
-          root.querySelector("#quote-success").classList.remove("hidden");
+          const successState = root.querySelector("#quote-success");
+          successState.classList.remove("hidden");
+          successState.dispatchEvent(new CustomEvent("sam:quote-success", { bubbles: true }));
           quoteForm.reset();
           quoteQty = 1; qtyVal.textContent = 1;
         } catch (err) {
@@ -978,7 +989,7 @@ function SamApp(appConfig) {
       const panelName = config.panels[0].label;
 
       return `
-  <header class="border-b border-gray-200 px-6 py-4">
+  <header data-sam-motion="header" class="border-b border-gray-200 px-6 py-4">
     <nav class="mx-auto flex max-w-7xl items-center">
       <a href="/" class="inline-flex items-center" aria-label="Koplus">
         <img src="${LOGO_URL}" onerror="${LOGO_ONERROR}" alt="Koplus" class="h-8 w-auto">
@@ -991,7 +1002,7 @@ function SamApp(appConfig) {
 
       <!-- LEFT — Product image -->
       <div class="lg:w-3/5 lg:sticky lg:top-0 lg:self-start lg:h-screen lg:flex lg:flex-col lg:justify-center lg:bg-[#fafbfc]">
-        <div id="pod-image" class="relative w-full rounded-xl lg:rounded-2xl bg-[#fafbfc] aspect-[4/3] lg:aspect-auto lg:h-[85vh] overflow-hidden">
+        <div id="pod-image" data-sam-motion="visual" class="relative w-full rounded-xl lg:rounded-2xl bg-[#fafbfc] aspect-[4/3] lg:aspect-auto lg:h-[85vh] overflow-hidden">
           ${config.layers.map(l =>
             `<img id="layer-${l.key}" class="pod-layer absolute inset-0 h-full w-full object-contain" style="z-index:${l.zIndex}; opacity:0" src="" alt="${l.key} layer">`
           ).join("\n          ")}
@@ -1008,31 +1019,31 @@ function SamApp(appConfig) {
       <div class="lg:w-2/5 flex flex-col gap-6">
 
         <!-- Series name — aligns with the top edge of the product image on the left. -->
-        <div>
+        <div data-sam-motion="intro">
           <h1 class="font-['Cal_Sans'] text-[40px] md:text-[52px] lg:text-[64px] font-normal leading-[1.05]" style="color:#0a2240">${series.name}</h1>
           ${series.tagline ? `<p class="font-['Noto_Sans'] text-base font-light leading-snug mt-0.5" style="color:#5b6b7b">${series.tagline}</p>` : ""}
         </div>
 
         <!-- Product title — sits directly below the series tagline and updates with the
              selector. Title text is API-driven (config.title); per-size naming lives in CMS. -->
-        <h2 class="font-['Noto_Sans'] text-[22px] md:text-[26px] lg:text-[30px] font-medium leading-[1.2] -mt-2" style="color:#0a2240">${productTitle}</h2>
+        <h2 data-sam-motion="intro" class="font-['Noto_Sans'] text-[22px] md:text-[26px] lg:text-[30px] font-medium leading-[1.2] -mt-2" style="color:#0a2240">${productTitle}</h2>
 
         <!-- Product selector (Single / Medium / Large) — compact pill with generous
              per-option padding so each segment (incl. the selected one) reads spacious. -->
-        <div class="flex gap-1 rounded-full bg-gray-100 p-1.5 self-start -mt-2">
+        <div data-sam-motion="intro" class="flex gap-1 rounded-full bg-gray-100 p-1.5 self-start -mt-2">
           ${products.map(p =>
             `<button onclick="_samSwitchTo('${p.key}')" class="rounded-full px-7 py-2 text-sm font-medium transition ${p.key === activeKey ? 'bg-[#061629] text-white shadow-sm' : 'text-gray-500 hover:text-gray-900'}">${p.label}</button>`
           ).join("\n          ")}
         </div>
 
         <!-- Product description (API-driven subtitle) — Noto Sans Light to match the tagline. -->
-        ${subtitle ? `<p class="font-['Noto_Sans'] text-lg font-light leading-[22px]" style="color:#5b6b7b">${subtitle}</p>` : ""}
+        ${subtitle ? `<p data-sam-motion="intro" class="font-['Noto_Sans'] text-lg font-light leading-[22px]" style="color:#5b6b7b">${subtitle}</p>` : ""}
 
         <!-- Divider (replaces the former "Configure" heading). -->
         <div class="border-b border-gray-300"></div>
 
         <!-- ═══ Section: Setup ═══ -->
-        <div class="cfg-section">
+        <div data-sam-motion="section" class="cfg-section">
           <button class="section-toggle w-full flex items-center justify-between py-2">
             <h2 class="text-lg font-bold" style="color:#0a2240">Setup</h2>
             <span class="section-chevron text-gray-400 transition-transform" style="transform:rotate(180deg)">${ICON_CHEVRON_DOWN}</span>
@@ -1083,7 +1094,7 @@ function SamApp(appConfig) {
         </div>
 
         <!-- ═══ Section: Color and Materials ═══ -->
-        <div class="cfg-section">
+        <div data-sam-motion="section" class="cfg-section">
           <button class="section-toggle w-full flex items-center justify-between py-2">
             <h2 class="text-lg font-bold" style="color:#0a2240">Colour Option</h2>
             <span class="section-chevron text-gray-400 transition-transform" style="transform:rotate(180deg)">${ICON_CHEVRON_DOWN}</span>
@@ -1129,7 +1140,7 @@ function SamApp(appConfig) {
 
         ${optionalAccessories.some(a => (a.displaySection || "accessory") === "accessory") ? `
         <!-- ═══ Section: Accessories ═══ -->
-        <div class="cfg-section">
+        <div data-sam-motion="section" class="cfg-section">
           <button class="section-toggle w-full flex items-center justify-between py-2">
             <h2 class="text-lg font-bold" style="color:#0a2240">Accessory</h2>
             <span class="section-chevron text-gray-400 transition-transform" style="transform:rotate(180deg)">${ICON_CHEVRON_DOWN}</span>
@@ -1153,7 +1164,7 @@ function SamApp(appConfig) {
   <div class="h-24"></div>
 
   <!-- Sticky bottom configuration summary bar -->
-  <div id="cfg-summary-bar" class="fixed bottom-0 left-0 right-0 z-40 border-t border-gray-200 bg-white" style="box-shadow:0 -2px 12px rgba(0,0,0,0.06)">
+  <div id="cfg-summary-bar" data-sam-motion="summary" class="fixed bottom-0 left-0 right-0 z-40 border-t border-gray-200 bg-white" style="box-shadow:0 -2px 12px rgba(0,0,0,0.06)">
     <div class="w-full px-5 sm:px-12 lg:px-20 py-2.5 sm:py-3 flex items-center gap-2 sm:gap-4">
       <!-- Left: live product thumbnail + product / live summary -->
       <div class="flex items-center gap-3 flex-1 min-w-0">
